@@ -1,0 +1,31 @@
+summary: All Titles
+description:
+  Get a list of all titles stored on the server, including save and extdata
+tags:
+  - v1
+responses:
+  200:
+    description: "The list of titles"
+    content:
+      application/json:
+        schema:
+          type: object
+          additionalProperties:
+            type: object
+            description: The key is a decimal TitleID
+            properties:
+              save:
+                type: array
+                items:
+                  $ref: './components/ServerFileInfo.yaml'
+              extdata:
+                type: array
+                items:
+                  $ref: './components/ServerFileInfo.yaml'
+          example:
+            "1125899907186432":
+              save:
+                - path: GameData.bin
+                  size: 18444
+                  hash: d41d8cd98f00b204e9800998ecf8427e
+              extdata: []

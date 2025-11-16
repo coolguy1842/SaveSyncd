@@ -1,10 +1,16 @@
 use rocket::http::Status;
 
-pub mod save;
-pub mod extdata;
-pub mod title;
+pub mod ticket;
+pub mod file_info;
+pub mod titles;
+pub mod upload;
 
 #[get("/v1/status")]
-pub fn v1_status() -> Status {
+pub fn status_get() -> Status {
+    Status::NoContent
+}
+
+#[head("/v1/status")]
+pub fn status_head() -> Status {
     Status::NoContent
 }

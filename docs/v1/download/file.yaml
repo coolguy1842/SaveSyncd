@@ -1,0 +1,24 @@
+summary: Download File
+description:
+  Downloads a file from the tickets staging path
+tags:
+  - v1
+responses:
+  200:
+    description: The file data
+    content:
+      application/octet-stream: {}
+  403:
+    description: The ticket, or file path wasn't valid
+parameters:
+  - name: ticket
+    in: path
+    schema:
+      $ref: '../components/Ticket.yaml'
+    required: true
+  - name: path
+    in: query
+    schema:
+      type: string
+    example: /GameData.bin
+    required: true

@@ -1,0 +1,6 @@
+allOf:
+  - $ref: './FileInfo.yaml'
+  - required:
+      - path
+      - size
+      - hash

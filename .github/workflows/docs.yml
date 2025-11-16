@@ -1,0 +1,47 @@
+name: Build Documentation
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Redocly Build
+        uses: fluximus-prime/redocly-cli-github-action@v1
+        with:
+          args: 'build-docs docs/savesyncd.yml -o docs.html'
+
+      - name: Create deployment path
+        run: |
+          mkdir public
+          mv docs.html public/index.html
+
+      - name: Upload HTML
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build_docs
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

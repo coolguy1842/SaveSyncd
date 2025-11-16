@@ -1,0 +1,14 @@
+type: object
+properties:
+  path:
+    type: string
+    format: File Path
+    example: /GameData.bin
+  size:
+    type: integer
+    format: uint64
+    example: 18444
+  hash:
+    type: string
+    format: MD5 checksum
+    example: d41d8cd98f00b204e9800998ecf8427e

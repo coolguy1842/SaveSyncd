@@ -1,0 +1,16 @@
+summary: Cancel Upload
+description:
+  Deletes the staging path, no server files have been changed
+tags:
+  - v1
+responses:
+  204:
+    description: The upload has been cancelled
+  403:
+    description: The ticket wasn't valid
+parameters:
+  - name: ticket
+    in: path
+    schema:
+      $ref: '../components/Ticket.yaml'
+    required: true

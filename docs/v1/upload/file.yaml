@@ -1,0 +1,28 @@
+summary: Upload File
+description:
+  Uploads a file to the tickets staging path
+tags:
+  - v1
+responses:
+  201:
+    description: The file was created
+  204:
+    description: The file was updated
+  403:
+    description: The ticket wasn't valid, or the file already exists as a directory, or the file path tried to go out of root
+parameters:
+  - name: ticket
+    in: path
+    schema:
+      $ref: '../components/Ticket.yaml'
+    required: true
+  - name: path
+    in: query
+    schema:
+      type: string
+    example: /GameData.bin
+    required: true
+requestBody:
+  required: true
+  content:
+    application/octet-stream: {}

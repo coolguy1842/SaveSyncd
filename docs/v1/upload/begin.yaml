@@ -1,0 +1,42 @@
+summary: Begin Upload
+description:
+  Uploads and downloads are kept in a staging folder, this prevents conflicts of data changing during an upload, and also allows multiple uploads.
+  The last closed upload will be kept.
+tags:
+  - v1
+responses:
+  200:
+    description: The server has requested files from the client
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            ticket:
+              $ref: '../components/Ticket.yaml'
+            files:
+              type: array
+              description: The out of date files, requiring upload
+              items:
+                type: string
+              example:
+                - "/GameData.bin"
+  204:
+    description: The server files are up to date with the client
+  400:
+    description: The client did not send valid JSON data
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          id:
+            $ref: '../components/TitleID.yaml'
+          container:
+            $ref: '../components/Container.yaml'
+          files:
+            type: array
+            items:
+              $ref: '../components/ClientFileInfo.yaml'

@@ -1,0 +1,9 @@
+type: string
+description: "The action that should be done on the file"
+enum:
+  - KEEP
+  - REPLACE
+  - CREATE
+  - REMOVE
+requested: true
+example: KEEP

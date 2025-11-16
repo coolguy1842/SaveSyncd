@@ -1,0 +1,16 @@
+summary: Cancel Download
+description:
+  Cancels the staging download, deletes the cloned data, this works the same as end.
+tags:
+  - v1
+responses:
+  204:
+    description: The ticket, and staging path has been cleaned up
+  403:
+    description: The ticket wasn't valid
+parameters:
+  - name: ticket
+    in: path
+    schema:
+      $ref: '../components/Ticket.yaml'
+    required: true

@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: SaveSyncd
+  version: 1.0.0
+
+servers:
+  - url: 'http://{hostname}:{port}'
+    variables:
+      hostname:
+        description: IP Address,
+        default: HOSTNAME
+      port:
+        description: Port for the server,
+        default: 8000
+
+paths:
+  /v1/status:
+    get:
+      $ref: './v1/status.yaml'
+  /v1/titles:
+    get:
+      $ref: './v1/titles.yaml'
+  /v1/upload/begin:
+    post:
+      $ref: './v1/upload/begin.yaml'
+  /v1/upload/{ticket}/file:
+    put:
+      $ref: './v1/upload/file.yaml'
+  /v1/upload/{ticket}/end:
+    put:
+      $ref: './v1/upload/end.yaml'
+  /v1/upload/{ticket}:
+    delete:
+      $ref: './v1/upload/cancel.yaml'
+  /v1/download/begin:
+    post:
+      $ref: './v1/download/begin.yaml'
+  /v1/download/{ticket}/file:
+    get:
+      $ref: './v1/download/file.yaml'
+  /v1/download/{ticket}/end:
+    delete:
+      $ref: './v1/download/end.yaml'
+
+tags:
+  - name: v1
+    description: First version of the API

@@ -1,0 +1,45 @@
+summary: Begin Download
+description:
+  See [/v1/upload/begin](#tag/v1/paths/~1v1~1upload~1begin/post) for details.
+tags:
+  - v1
+responses:
+  200:
+    description: The server has differing files
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            ticket:
+              $ref: '../components/Ticket.yaml'
+            files:
+              type: array
+              description: The files requiring action
+              items:
+                allOf:
+                  - $ref: '../components/ServerFileInfo.yaml'
+                  - properties:
+                      action:
+                        $ref: '../components/FileAction.yaml'
+                  - required:
+                    - action 
+  204:
+    description: The client files are up to date with the server
+  400:
+    description: The client did not send valid JSON data
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          id:
+            $ref: '../components/TitleID.yaml'
+          container:
+            $ref: '../components/Container.yaml'
+          existingFiles:
+            type: array
+            items:
+              $ref: '../components/ClientFileInfo.yaml'

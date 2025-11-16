@@ -1,0 +1,16 @@
+summary: End Upload
+description:
+  Completes the staging upload, updates the servers files
+tags:
+  - v1
+responses:
+  204:
+    description: The server files have been updated with the uploaded files
+  403:
+    description: The ticket wasn't valid
+parameters:
+  - name: ticket
+    in: path
+    schema:
+      $ref: '../components/Ticket.yaml'
+    required: true

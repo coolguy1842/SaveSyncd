@@ -1,0 +1,9 @@
+summary: Server Status
+description: Check if the server is online
+tags:
+  - v1
+responses:
+  204:
+    description: The server is online
+  404:
+    description: The server is offline

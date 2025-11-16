@@ -1,0 +1,6 @@
+type: string
+description: "The container the files are from, either SAVE or EXTDATA"
+enum:
+  - SAVE
+  - EXTDATA
+example: SAVE
