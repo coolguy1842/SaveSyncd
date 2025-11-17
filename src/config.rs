@@ -18,7 +18,7 @@ impl Config {
     }
 
     pub fn load() -> Self {
-        let config = Config { port: 8000, data_directory: dirs::data_dir().expect("Failed to get data dir") };
+        let config = Config { port: 8000, data_directory: dirs::data_dir().expect("Failed to get data dir").join("SaveSyncd") };
         let path = Config::config_file();
 
         if !fs::exists(path.clone()).unwrap_or(false) {
@@ -46,5 +46,5 @@ impl Config {
     }
 
     pub fn port(&self) -> u16 { return self.port }
-    pub fn data_directory(&self) -> PathBuf { return self.data_directory.clone().join("SaveSyncd") }
+    pub fn data_directory(&self) -> PathBuf { return self.data_directory.clone() }
 }
