@@ -17,11 +17,19 @@ responses:
               save:
                 type: array
                 items:
-                  $ref: './components/ServerFileInfo.yaml'
+                  allOf:
+                    - $ref: '../components/ServerFileInfo.yaml'
+                    - required:
+                      - size
+                      - hash
               extdata:
                 type: array
                 items:
-                  $ref: './components/ServerFileInfo.yaml'
+                  allOf:
+                    - $ref: '../components/ServerFileInfo.yaml'
+                    - required:
+                      - size
+                      - hash
           example:
             "1125899907186432":
               save:

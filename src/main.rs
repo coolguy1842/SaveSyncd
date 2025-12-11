@@ -35,7 +35,11 @@ async fn main() -> Result<(), rocket::error::Error> {
             v1::upload::begin::upload_begin,
             v1::upload::file::upload_file,
             v1::upload::end::upload_end,
-            v1::upload::cancel::upload_cancel
+            v1::upload::cancel::upload_cancel,
+
+            v1::download::begin::download_begin,
+            v1::download::file::download_file,
+            v1::download::end::download_end
         ])
         .launch()
         .await?;

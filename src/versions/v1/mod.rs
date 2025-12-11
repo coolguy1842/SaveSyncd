@@ -4,6 +4,7 @@ pub mod ticket;
 pub mod file_info;
 pub mod titles;
 pub mod upload;
+pub mod download;
 
 #[get("/v1/status")]
 pub fn status_get() -> Status {

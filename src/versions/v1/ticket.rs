@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env, path::PathBuf, str::FromStr, sync::{Arc, Mutex}};
+use std::{collections::HashMap, env, fs, io, path::{Path, PathBuf}, str::FromStr, sync::{Arc, Mutex}};
 
 use fs_extra::dir::remove;
 use uuid::Uuid;
@@ -61,4 +61,21 @@ pub fn clear_tickets_path() -> Result<(), fs_extra::error::Error> {
 
 pub fn clear_ticket_path(ticket: Uuid) -> Result<(), fs_extra::error::Error> {
     remove(ticket_path(ticket))
+}
+
+pub fn copy_dir_all(src: impl AsRef<Path>, dst: impl AsRef<Path>) -> io::Result<()> {
+    fs::create_dir_all(&dst)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let file_type = entry.file_type()?;
+        
+        if file_type.is_dir() {
+            copy_dir_all(entry.path(), dst.as_ref().join(entry.file_name()))?;
+            continue;
+        }
+
+        fs::copy(entry.path(), dst.as_ref().join(entry.file_name()))?;
+    }
+    
+    Ok(())
 }

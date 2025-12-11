@@ -23,7 +23,7 @@ responses:
                       action:
                         $ref: '../components/FileAction.yaml'
                   - required:
-                    - action 
+                    - action
   204:
     description: The client files are up to date with the server
   400:
