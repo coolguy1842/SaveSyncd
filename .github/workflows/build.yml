@@ -6,6 +6,9 @@ on:
 env:
   dev_tag: latest
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build
