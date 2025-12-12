@@ -21,7 +21,9 @@ fs_extra = "1.3.0"
 md5 = "0.8.0"
 tray-icon = "0.21.2"
 image = "0.25.9"
-gtk = "0.18.2"
 winit = "0.30.12"
 once_cell = "1.21.3"
 crossbeam-channel = "0.5.15"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+gtk = "0.18.2"

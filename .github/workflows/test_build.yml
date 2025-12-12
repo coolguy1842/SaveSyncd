@@ -9,6 +9,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt install -y \
+            libgtk-3-dev \
+            libxdo-dev \
+            libappindicator3-dev
+
+      - name: Build
+        run: cargo build --verbose
