@@ -1,6 +1,6 @@
 [package]
 name = "SaveSyncd"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 authors = ["coolguy1842 <coolguy1842@proton.me>"]
 license = "GPL3"
