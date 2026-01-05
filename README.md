@@ -13,6 +13,7 @@ Run with:
 cargo build --release
 ./target/release/SaveSyncd
 ```
+You can also build with: `--no-default-features` to disable the tray icon.
 The default paths are:
 
 ### Config

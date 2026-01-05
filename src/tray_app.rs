@@ -1,7 +1,8 @@
 use crossbeam_channel::{Receiver, Sender, unbounded};
 use resvg::{tiny_skia::Pixmap, usvg::{self, Transform}};
-use tray_icon::{TrayIcon, TrayIconBuilder, menu::{Menu, MenuItem}};
-use winit::application::ApplicationHandler;
+use rocket::tokio;
+use tray_icon::{TrayIcon, TrayIconBuilder, TrayIconEvent, menu::{Menu, MenuEvent, MenuItem}};
+use winit::{application::ApplicationHandler, event_loop::EventLoop};
 use once_cell::sync::{OnceCell, Lazy};
 
 #[derive(Debug, Clone)]
@@ -79,6 +80,38 @@ impl Application {
         }
 
         menu
+    }
+
+    pub fn run(mut self) {
+        let event_loop = EventLoop::<UserEvent>::with_user_event().build().expect("Failed to create EventLoop");
+
+        let tray_icon_proxy = event_loop.create_proxy();
+        TrayIconEvent::set_event_handler(Some(move |event| { let _ = tray_icon_proxy.send_event(UserEvent::TrayIconEvent(event)); }));
+        
+        let menu_proxy = event_loop.create_proxy();
+        MenuEvent::set_event_handler(Some(move |event| { let _ = menu_proxy.send_event(UserEvent::MenuEvent(event)); }));
+
+        let quit_proxy = event_loop.create_proxy();
+        QuitEvent::set_event_handler(Some(move |event| { let _ = quit_proxy.send_event(UserEvent::QuitEvent(event)); }));
+        
+        let _menu_channel = MenuEvent::receiver();
+        let _tray_channel = TrayIconEvent::receiver();
+        
+        #[cfg(target_os = "linux")]
+        std::thread::spawn(|| {
+            gtk::init().unwrap();
+            let _tray_icon = Application::new_tray_icon();
+            gtk::main();
+        });
+
+        tokio::spawn(async move {
+            tokio::signal::ctrl_c().await.unwrap();
+            QuitEvent::send(QuitEvent{});
+        });
+
+        if let Err(err) = event_loop.run_app(&mut self) {
+            println!("Error: {:?}", err);
+        }
     }
 }
 
