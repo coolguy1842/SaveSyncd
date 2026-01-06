@@ -1,6 +1,6 @@
 [package]
 name = "SaveSyncd"
-version = "1.0.1"
+version = "1.0.2"
 edition = "2021"
 authors = ["coolguy1842 <coolguy1842@proton.me>"]
 license = "GPL3"
@@ -8,7 +8,11 @@ description = "Server for syncing saves with the 3DS"
 readme = "README.md"
 homepage = "https://github.com/coolguy1842/SaveSyncd"
 repository = "https://github.com/coolguy1842/SaveSyncd"
-keywords = ["daemon", "3ds", "server"]
+keywords = [ "daemon", "3ds", "server" ]
+
+[features]
+default = [ "tray" ]
+tray = [ "dep:tray-icon", "dep:winit", "dep:once_cell", "dep:crossbeam-channel", "dep:resvg", "dep:gtk" ]
 
 [dependencies]
 ws = { package = "rocket_ws", version = "0.1.1" }
@@ -19,11 +23,11 @@ uuid = { version = "1.18.1", features = [ "v4" ] }
 dirs = "6.0.0"
 fs_extra = "1.3.0"
 md5 = "0.8.0"
-tray-icon = "0.21.2"
-winit = "0.30.12"
-once_cell = "1.21.3"
-crossbeam-channel = "0.5.15"
-resvg = "0.45.1"
+tray-icon = { version = "0.21.2", optional = true }
+winit = { version = "0.30.12", optional = true }
+once_cell = { version = "1.21.3", optional = true }
+crossbeam-channel = { version = "0.5.15", optional = true }
+resvg = { version = "0.45.1", optional = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
-gtk = "0.18.2"
+gtk = { version = "0.18.2", optional = true }

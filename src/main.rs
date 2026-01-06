@@ -1,41 +1,18 @@
-use std::{collections::HashMap, sync::{Arc, Mutex}, time::Duration};
+use std::{collections::HashMap, sync::{Arc, Mutex}};
 
 use rocket::{data::{Limits, ToByteUnit}, tokio};
-use tray_icon::{TrayIconEvent, menu::MenuEvent};
-use winit::event_loop::EventLoop;
-use crate::{config::Config, tray_app::{Application, QuitEvent, UserEvent}, versions::v1};
+use crate::{config::Config, versions::v1};
 
 #[macro_use] extern crate rocket;
 
 pub mod config;
 pub mod versions;
+
+#[cfg(feature = "tray")]
 pub mod tray_app;
 
-
-fn main() {
-    let event_loop = EventLoop::<UserEvent>::with_user_event().build().unwrap();
-
-    let tray_icon_proxy = event_loop.create_proxy();
-    TrayIconEvent::set_event_handler(Some(move |event| { let _ = tray_icon_proxy.send_event(UserEvent::TrayIconEvent(event)); }));
-    
-    let menu_proxy = event_loop.create_proxy();
-    MenuEvent::set_event_handler(Some(move |event| { let _ = menu_proxy.send_event(UserEvent::MenuEvent(event)); }));
-
-    let quit_proxy = event_loop.create_proxy();
-    QuitEvent::set_event_handler(Some(move |event| { let _ = quit_proxy.send_event(UserEvent::QuitEvent(event)); }));
-
-    let mut app = Application::new();
-    
-    let _menu_channel = MenuEvent::receiver();
-    let _tray_channel = TrayIconEvent::receiver();
-    
-    #[cfg(target_os = "linux")]
-    std::thread::spawn(|| {
-        gtk::init().unwrap();
-        let _tray_icon = Application::new_tray_icon();
-        gtk::main();
-    });
-
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // cleanup previous if exists
     v1::ticket::clear_tickets_path().expect("Failed to clear old tickets path");
 
@@ -50,42 +27,45 @@ fn main() {
             .limit("json", 8.mebibytes())
         ));
 
-    let rt = tokio::runtime::Builder::new_multi_thread()
-        .enable_all()
-        .build()
-        .expect("failed to create Tokio runtime");
+    let rocket = rocket::custom(figment)
+        .manage(tickets)
+        .manage(config)
+        .mount("/", routes![
+            v1::status_get,
+            v1::status_head,
+            v1::titles::titles,
 
-    rt.spawn(async move {
-        rocket::custom(figment)
-            .manage(tickets)
-            .manage(config)
-            .mount("/", routes![
-                v1::status_get,
-                v1::status_head,
-                v1::titles::titles,
+            v1::upload::begin::upload_begin,
+            v1::upload::file::upload_file,
+            v1::upload::end::upload_end,
+            v1::upload::cancel::upload_cancel,
 
-                v1::upload::begin::upload_begin,
-                v1::upload::file::upload_file,
-                v1::upload::end::upload_end,
-                v1::upload::cancel::upload_cancel,
+            v1::download::begin::download_begin,
+            v1::download::file::download_file,
+            v1::download::end::download_end
+        ]).ignite().await?;
 
-                v1::download::begin::download_begin,
-                v1::download::file::download_file,
-                v1::download::end::download_end
-            ])
-            .launch()
-            .await
+    let _shutdown = rocket.shutdown();
+    let rocket_handle = tokio::spawn(async move {
+        rocket.launch().await
     });
 
-    rt.spawn(async move {
-        tokio::signal::ctrl_c().await.unwrap();
-        QuitEvent::send(QuitEvent{});
-    });
-    
-    if let Err(err) = event_loop.run_app(&mut app) {
-        println!("Error: {:?}", err);
+    #[cfg(feature = "tray")]
+    {
+        use crate::tray_app::Application;
+        let app = Application::new();
+
+        app.run();
+        _shutdown.notify();
+        let _ = tokio::join!(rocket_handle);
     }
 
-    rt.shutdown_timeout(Duration::from_millis(1000));
+    #[cfg(not(feature = "tray"))]
+    {
+        let _ = tokio::join!(rocket_handle);
+    }
+
     v1::ticket::clear_tickets_path().expect("Failed to cleanup tickets path");
+
+    Ok(())
 }

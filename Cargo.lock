@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "SaveSyncd"
-version = "1.0.1"
+version = "1.0.2"
 dependencies = [
  "crossbeam-channel",
  "dirs",
