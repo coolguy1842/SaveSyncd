@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fs, os::unix::fs::MetadataExt, path::Path, str::FromStr};
+use std::{collections::HashMap, fs, path::Path, str::FromStr};
 
 use fs_extra::dir::{self, get_dir_content2};
 use rocket::{State, http::Status, serde::{Deserialize, json::Json}};
@@ -57,7 +57,7 @@ pub fn download_begin(tickets: &State<Tickets>, config: &State<Config>, data: Js
         let Some(file) = path.strip_prefix(container_path_str) else { continue; };
         let Ok(metadata) = fs::metadata(&path) else { continue; };
 
-        let size = metadata.size();
+        let size = metadata.len();
         let Ok(hash) = file_hash(Path::new(&path)) else { continue; };
 
         if let Some(info) = actions.get_mut(file) {

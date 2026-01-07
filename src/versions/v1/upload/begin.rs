@@ -1,11 +1,10 @@
-use std::{os::unix::fs::MetadataExt, str::FromStr};
+use std::str::FromStr;
 
 use fs_extra::dir::create_all;
 use rocket::{State, http::Status, serde::{Deserialize, json::Json}};
 use serde::Serialize;
 use uuid::Uuid;
 use crate::{config::Config, v1::ticket::{Container, Ticket, TicketType, Tickets, ticket_path}, versions::v1::file_info::{ClientFileInfo, file_hash}};
-
 
 #[derive(Debug, PartialEq, Eq, Deserialize)]
 pub struct BeginBody {
@@ -56,7 +55,7 @@ pub fn upload_begin(tickets: &State<Tickets>, config: &State<Config>, data: Json
 
         let Ok(metadata) = file_path.metadata() else { continue; };
 
-        if file.size != metadata.size() {
+        if file.size != metadata.len() {
             continue;
         }
 

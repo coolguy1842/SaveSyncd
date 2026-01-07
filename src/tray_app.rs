@@ -85,9 +85,6 @@ impl Application {
     pub fn run(mut self) {
         let event_loop = EventLoop::<UserEvent>::with_user_event().build().expect("Failed to create EventLoop");
 
-        let tray_icon_proxy = event_loop.create_proxy();
-        TrayIconEvent::set_event_handler(Some(move |event| { let _ = tray_icon_proxy.send_event(UserEvent::TrayIconEvent(event)); }));
-        
         let menu_proxy = event_loop.create_proxy();
         MenuEvent::set_event_handler(Some(move |event| { let _ = menu_proxy.send_event(UserEvent::MenuEvent(event)); }));
 
