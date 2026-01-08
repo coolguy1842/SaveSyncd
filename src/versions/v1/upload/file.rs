@@ -1,5 +1,6 @@
 use std::fs;
 
+use fs_extra::dir::create_all;
 use rocket::{State, http::Status};
 use uuid::Uuid;
 use crate::{v1::ticket::Tickets, versions::v1::ticket::{TicketType, ticket_path}};
@@ -20,15 +21,24 @@ pub fn upload_file(tickets: &State<Tickets>, ticket: &str, path: &str, data: Vec
         return Err(Status::BadRequest)
     }
 
-    let created = !file_path.exists();
-    if fs::write(file_path, data).is_err() {
-        return Err(Status::InternalServerError)
+    let parent = file_path.parent().expect("Failed to get parent directory");
+    if !parent.exists() {
+        create_all(parent, false).expect("Failed to create parent path");
     }
 
-    Ok(
-        match created {
-        true => Status::Created,
-        false => Status::NoContent
+    let created = !file_path.exists();
+    match fs::write(file_path, data) {
+    Err(err) => {
+        println!("Failed to write to file: {}", err);
+        Err(Status::InternalServerError)
+    },
+    _ => {
+        Ok(
+            match created {
+                true => Status::Created,
+                false => Status::NoContent
+                }
+            )
         }
-    )
+    }
 }
