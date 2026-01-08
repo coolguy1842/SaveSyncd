@@ -1,5 +1,5 @@
 name: Create Tag on Version Bump
-on: [ pull_request, push ]
+on: [ push ]
 
 jobs:
   createtag:
@@ -19,3 +19,4 @@ jobs:
         with:
           tag: "${{ steps.read_toml.outputs.value }}"
           tag_exists_error: false
+          github_token: ${{ secrets.REPO_TOKEN }}
