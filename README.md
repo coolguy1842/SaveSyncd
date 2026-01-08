@@ -55,8 +55,12 @@ The default paths are:
 | Mac      | /Users/user/Library/Application Support/SaveSyncd/config.json            |
 
 ### Data (Defined in Config)
-| Platform | Path                                                                     |
+| Platform | Path                                                         |
 | -------- | ------------------------------------------------------------ |
 | Windows  | C:\Users\user\AppData\Roaming/SaveSyncd                      |
 | Linux    | /home/user/.local/share/SaveSyncd                            |
 | Mac      | /Users/user/Library/Application Support/SaveSyncd            |
+
+## TODO
+- [ ] Ship Executables in Releases, e.g AppImage, Flatpak, exe
+- [ ] Implement Timeouts for Upload/Download Tickets

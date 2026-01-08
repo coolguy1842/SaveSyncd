@@ -1,0 +1,29 @@
+name: Create Tag on Version Bump
+on: 
+  push:
+    branches: [ master ]
+
+permissions:
+  contents: write
+
+jobs:
+  createtag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: SebRollen/toml-action@v1.2.0
+        id: read_toml
+        with:
+          file: 'Cargo.toml'
+          field: 'package.version'
+
+      - uses: rickstaa/action-create-tag@v1
+        id: tag_create
+        with:
+          tag: "v${{ steps.read_toml.outputs.value }}"
+          tag_exists_error: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
