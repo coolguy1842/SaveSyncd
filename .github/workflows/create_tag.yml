@@ -1,5 +1,10 @@
 name: Create Tag on Version Bump
-on: [ push ]
+on: 
+  push:
+    branches: [ master ]
+
+permissions:
+  contents: write
 
 jobs:
   createtag:
@@ -7,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: SebRollen/toml-action@v1.2.0
         id: read_toml
@@ -19,4 +26,4 @@ jobs:
         with:
           tag: "${{ steps.read_toml.outputs.value }}"
           tag_exists_error: false
-          github_token: ${{ secrets.REPO_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
