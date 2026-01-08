@@ -24,6 +24,6 @@ jobs:
       - uses: rickstaa/action-create-tag@v1
         id: tag_create
         with:
-          tag: "${{ steps.read_toml.outputs.value }}"
+          tag: "v${{ steps.read_toml.outputs.value }}"
           tag_exists_error: false
           github_token: ${{ secrets.GITHUB_TOKEN }}
