@@ -19,7 +19,7 @@ pub fn upload_end(tickets: &State<Tickets>, config: &State<Config>, ticket: &str
         dir::create_all(config.data_directory(), false).expect("Failed to create data directory");
     }
     
-    let title_path = config.data_directory().join(format!("{:X}", ticket.title_id));
+    let title_path = config.data_directory().join(format!("{:04X}", ticket.title_id));
     let container_path = title_path.join(ticket.container.to_string().to_lowercase());
 
     if !title_path.exists() {
