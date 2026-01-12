@@ -34,7 +34,7 @@ pub fn upload_begin(tickets: &State<Tickets>, config: &State<Config>, data: Json
     create_all(ticket_path(ticket_id), false).expect("Failed to create directories for ticket");
     ticket_map.insert(ticket_id, ticket);
 
-    let title_path = config.data_directory().join(format!("{:X}", data.id));
+    let title_path = config.data_directory().join(format!("{:04X}", data.id));
     let container_path = title_path.join(container.to_string().to_lowercase());
 
     if !container_path.exists() {

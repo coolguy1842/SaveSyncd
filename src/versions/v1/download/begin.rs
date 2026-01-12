@@ -25,7 +25,7 @@ pub fn download_begin(tickets: &State<Tickets>, config: &State<Config>, data: Js
     let container = Container::from_str(&data.container).map_err(|_| Status::BadRequest)?;
     let mut ticket_map = tickets.lock().map_err(|_| Status::InternalServerError)?;
 
-    let title_path = config.data_directory().join(format!("{:X}", data.id));
+    let title_path = config.data_directory().join(format!("{:04X}", data.id));
     let container_path = title_path.join(container.to_string().to_lowercase());
     let container_path_str = container_path.to_str().expect("Failed to get string of container path");
 
