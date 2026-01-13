@@ -33,41 +33,22 @@
                 RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
             };
         });
+        
+        nixosConfigurations.container = nixpkgs.lib.nixosSystem {
+            modules = [ ./nix/container.nix ];
+        };
 
+        nixosModules = rec {
+            savesyncd = (import ./nix/module.nix);
+            default = savesyncd;
+        };
 
         packages = forEachSystem (system: let
             pkgs = nixpkgs.legacyPackages.${system};
             manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
-        in {
-            default = pkgs.rustPlatform.buildRustPackage rec {
-                pname = manifest.name;
-                version = manifest.version;
-                
-                cargoLock.lockFile = ./Cargo.lock;
-                src = pkgs.lib.cleanSource ./.;
-
-                nativeBuildInputs = with pkgs; [
-                    makeWrapper
-                    pkg-config
-                ];
-
-                buildInputs = with pkgs; [
-                    gtk3
-                    libappindicator-gtk3
-                    xdotool
-                ];
-        
-                postFixup = ''
-                    wrapProgram $out/bin/SaveSyncd \
-                        --set LD_LIBRARY_PATH "${pkgs.lib.makeLibraryPath buildInputs}"
-                '';
-
-                meta = with pkgs.lib; {
-                    description = "Server for a 3DS Save Sync program";
-                    homepage = "https://github.com/coolguy1842/SaveSyncd/";
-                    license = licenses.gpl3;
-                };
-            };
+        in rec {
+            savesyncd = pkgs.callPackage ./nix/package.nix {};
+            default = savesyncd;
         });
     };
 }

@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::{Arc, Mutex}};
+use std::{collections::HashMap, path::Path, sync::{Arc, Mutex}};
 
 use rocket::{data::{Limits, ToByteUnit}, tokio};
 use crate::{config::Config, versions::v1};
@@ -11,13 +11,33 @@ pub mod versions;
 #[cfg(feature = "tray")]
 pub mod tray_app;
 
+fn print_usage() {
+    println!("Usage: SaveSyncd [Config File]");
+    std::process::exit(0);
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = std::env::args().collect();
+
+    let mut config_path = None;
+    if args.len() > 2 {
+        print_usage();
+    }
+    else if args.len() == 2 {
+        let path = Path::new(&args[1]).to_path_buf();
+        if !path.exists() {
+            print_usage();
+        }
+
+        config_path = Some(path);
+    }
+
     // cleanup previous if exists
     v1::ticket::clear_tickets_path().expect("Failed to clear old tickets path");
 
     let tickets: v1::ticket::Tickets = Arc::new(Mutex::new(HashMap::new()));
-    let config = Config::load();
+    let config = Config::load(config_path);
         
     let figment = rocket::Config::figment()
         .merge(("address", "0.0.0.0"))
@@ -55,16 +75,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         use crate::tray_app::Application;
         let app = Application::new();
 
-        app.run();
-        _shutdown.notify();
-        let _ = tokio::join!(rocket_handle);
+        if app.run() {
+            _shutdown.notify();
+        }
     }
 
-    #[cfg(not(feature = "tray"))]
-    {
-        let _ = tokio::join!(rocket_handle);
-    }
-
+    let _ = tokio::join!(rocket_handle);
     v1::ticket::clear_tickets_path().expect("Failed to cleanup tickets path");
 
     Ok(())
