@@ -46,13 +46,18 @@ pub enum UserEvent {
 
 pub struct Application {
     pub tray_icon: Option<TrayIcon>,
+    event_loop: Option<EventLoop<UserEvent>>
 }
 
 impl Application {
-    pub fn new() -> Application {
-        Application {
-            tray_icon: None
+    pub fn new_tray_menu() -> Menu {
+        let menu = Menu::new();
+        let close_button = MenuItem::with_id("close", "Close", true, None);
+        if let Err(err) = menu.append(&close_button) {
+            println!("{err:?}");
         }
+
+        menu
     }
 
     pub fn new_tray_icon() -> TrayIcon {
@@ -72,25 +77,24 @@ impl Application {
             .unwrap()
     }
 
-    pub fn new_tray_menu() -> Menu {
-        let menu = Menu::new();
-        let close_button = MenuItem::with_id("close", "Close", true, None);
-        if let Err(err) = menu.append(&close_button) {
-            println!("{err:?}");
+    pub fn new() -> Application {        
+        Application {
+            tray_icon: None,
+            event_loop: EventLoop::<UserEvent>::with_user_event().build().map_or(None, |val| Some(val))
         }
-
-        menu
     }
 
-    pub fn run(mut self) {
-        let event_loop = EventLoop::<UserEvent>::with_user_event().build().expect("Failed to create EventLoop");
+    pub fn run(mut self) -> bool {
+        // this feels dirty, will handle errors with tray not supported
+        let Some(event_loop) = self.event_loop else { return false };
+        self.event_loop = None;
 
         let menu_proxy = event_loop.create_proxy();
         MenuEvent::set_event_handler(Some(move |event| { let _ = menu_proxy.send_event(UserEvent::MenuEvent(event)); }));
 
         let quit_proxy = event_loop.create_proxy();
         QuitEvent::set_event_handler(Some(move |event| { let _ = quit_proxy.send_event(UserEvent::QuitEvent(event)); }));
-        
+
         let _menu_channel = MenuEvent::receiver();
         let _tray_channel = TrayIconEvent::receiver();
         
@@ -109,6 +113,8 @@ impl Application {
         if let Err(err) = event_loop.run_app(&mut self) {
             println!("Error: {:?}", err);
         }
+
+        true
     }
 }
 
