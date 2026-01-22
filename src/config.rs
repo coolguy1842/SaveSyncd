@@ -43,10 +43,8 @@ impl Config {
             return;
         }
         
-        if !fs::exists(&self.config_path).unwrap_or(false) {
-            if fs::create_dir_all(&self.config_path).is_err() {
-                return;
-            }
+        if let Some(parent) = self.config_path.parent() {
+            fs::create_dir_all(parent).expect("Failed to create config directory");
         }
 
         fs::write(&self.config_path, serde_json::to_string_pretty(self).expect("Failed to stringify config")).expect("Failed to write config");
